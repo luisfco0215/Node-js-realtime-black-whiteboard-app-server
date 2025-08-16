@@ -22,13 +22,11 @@ const users: User[] = [];
 io.on("connection", (socket: Socket) => {
     console.log("🔌 Cliente conectado:", socket.id);
 
-    // Crear o unirse a una room
     socket.on("join-room", ({ name, room }: { name: string; room: string }) => {
         socket.join(room);
         users.push({ id: socket.id, name, room });
         console.log(`${name} se unió a ${room}`);
 
-        // Emitir lista de usuarios activos en la room
         const roomUsers = users.filter((u) => u.room === room);
         io.to(room).emit("room-users", roomUsers);
     });

@@ -1,13 +1,7 @@
 import express from "express";
 import { createServer } from "http";
-import { Server, Socket } from "socket.io";
+import { Server } from "socket.io";
 import cors from "cors";
-
-interface User {
-    id: string;
-    name: string;
-    room: string;
-}
 
 const app = express();
 app.use(cors());
@@ -17,12 +11,12 @@ const io = new Server(httpServer, {
     cors: { origin: "http://localhost:5173", methods: ["GET", "POST"] },
 });
 
-const users: User[] = [];
+const users = [];
 
-io.on("connection", (socket: Socket) => {
+io.on("connection", (socket) => {
     console.log("🔌 Cliente conectado:", socket.id);
 
-    socket.on("join-room", ({ name, room }: { name: string; room: string }) => {
+    socket.on("join-room", ({ name, room }) => {
         socket.join(room);
         users.push({ id: socket.id, name, room });
         console.log(`${name} se unió a ${room}`);
@@ -31,7 +25,7 @@ io.on("connection", (socket: Socket) => {
         io.to(room).emit("room-users", roomUsers);
     });
 
-    socket.on("draw", (data: any & { room: string }) => {
+    socket.on("draw", (data) => {
         socket.to(data.room).emit("draw", data);
     });
 
